@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Homework · Classroom</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="/css/style.css"></head>
+<body>
+<header class="exambar" id="bar"></header>
+<div id="stage"></div>
+<script src="/js/app.js"></script>
+<script>
+(async () => {
+  const id = location.pathname.split('/').pop();
+  const [{ user }, a] = await Promise.all([api('/api/auth/me'), api('/api/classwork/' + id)]);
+  const bar = document.getElementById('bar'), stage = document.getElementById('stage');
+  const badge = h('span', { class: 'chip' });
+  bar.append(h('a', { href: '/classwork' }, '← Back to classwork'), h('strong', {}, a.title), h('span', { class: 'spacer' }), badge);
+
+  if (user.role === 'student' && a.submission) {
+    const s = a.submission;
+    stage.append(h('div', { class: 'done card' },
+      h('h2', {}, 'Handed in'),
+      h('p', {}, `You scored ${s.score} out of ${s.total}.`),
+      h('p', { class: 'meta' }, `${s.correctCount} correct · ${s.wrongCount} wrong · ${s.unansweredCount} unanswered`),
+      h('a', { class: 'btn', href: '/classwork' }, 'Back to classwork')));
+    return;
+  }
+  if (user.role !== 'student') badge.textContent = 'Preview: nothing is saved';
+
+  const frame = h('iframe', { class: 'examframe', src: `/api/classwork/${id}/exam`, sandbox: 'allow-scripts', title: a.title });
+  stage.append(frame);
+
+  // The exam runs in a sandboxed frame and tells us when the student finishes.
+  window.addEventListener('message', async (e) => {
+    const d = e.data;
+    if (e.source !== frame.contentWindow || !d || d.source !== 'classroom-exam' || d.type !== 'submit') return;
+    const reply = (ok, text) => frame.contentWindow.postMessage({ source: 'classroom-parent', ok, text }, '*');
+    if (user.role !== 'student') return reply(true, 'Preview only: nothing was saved.');
+    try {
+      const r = await api(`/api/classwork/${id}/exam-submit`, { method: 'POST', body: { answers: d.answers, timeUsedSeconds: d.timeUsedSeconds } });
+      badge.textContent = `Saved: ${r.score}/${r.total}`;
+      reply(true, `Your marks (${r.score}/${r.total}) have been saved and sent to your teacher.`);
+    } catch (err) {
+      reply(false, 'Your marks could not be saved: ' + err.message + ' Tell your teacher.');
+    }
+  });
+})();
+</script>
+</body></html>

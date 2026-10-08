@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Classwork · Classroom</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="/css/style.css"></head>
+<body>
+<div class="app"><nav class="side" id="nav" aria-label="Main"></nav><main id="main"></main></div>
+<script src="/js/app.js"></script>
+
+<script>
+(async () => {
+  const me = await shell('/classwork');
+  const main = document.getElementById('main');
+  const list = h('div');
+  const isTeacher = me.role === 'teacher';
+  main.append(h('h1', {}, 'Classwork'),
+    h('p', { class: 'lede' }, isTeacher ? 'Create assignments, upload homework files, and see marks.' : 'Your assignments and marks.'));
+
+  const mmss = (s) => String(Math.floor((s || 0) / 60)).padStart(2, '0') + ':' + String((s || 0) % 60).padStart(2, '0');
+  const letter = (i) => String.fromCharCode(65 + i);
+  const pct = (s) => (s.total ? Math.round((s.score / s.total) * 100) : 0);
+  const due = (a) => (a.dueDate ? 'Due ' + fmtDay(a.dueDate) : 'No due date') + ' · ' +
+    (a.isExam ? `${a.questionCount} questions${a.durationMinutes ? ' · ' + a.durationMinutes + ' min' : ''}` : a.points + ' points');
+
+  if (isTeacher) {
+    const f = { title: h('input', { id: 'a-title' }), instr: h('textarea', { id: 'a-instr', rows: 3 }),
+      file: h('input', { id: 'a-file', type: 'file', accept: '.html,text/html' }),
+      due: h('input', { id: 'a-due', type: 'date' }), pts: h('input', { id: 'a-pts', type: 'number', min: 1, value: 100 }) };
+    main.append(h('details', { class: 'card' }, h('summary', {}, 'New assignment'),
+      h('label', { for: 'a-file' }, 'Homework file (optional)'), f.file,
+      h('div', { class: 'meta' }, 'Upload an exam .html file and students take it here, with marks saved automatically. Leave empty for a written assignment.'),
+      h('label', { for: 'a-title' }, 'Title'), f.title,
+      h('label', { for: 'a-instr' }, 'Instructions'), f.instr,
+      h('div', { class: 'row' },
+        h('div', { style: 'flex:1' }, h('label', { for: 'a-due' }, 'Due date'), f.due),
+        h('div', { style: 'flex:1' }, h('label', { for: 'a-pts' }, 'Points (written only)'), f.pts)),
+      h('div', { class: 'row end', style: 'margin-top:1rem' }, h('button', { class: 'btn', onclick: async () => {
+        try {
+          const body = { title: f.title.value, instructions: f.instr.value, dueDate: f.due.value };
+          if (f.file.files[0]) body.examHtml = await f.file.files[0].text(); else body.points = f.pts.value;
+          await api('/api/classwork', { method: 'POST', body });
+          f.title.value = f.instr.value = f.due.value = f.file.value = ''; toast('Assignment created'); load();
+        } catch (e) { toast(e.message, true); }
+      } }, 'Create assignment'))));
+  }
+  main.append(list);
+
+  function examPanel(a, data) {
+    const subs = data.submissions;
+    if (!subs.length) return [h('p', { class: 'meta sub' }, 'Nothing handed in yet.')];
+    const ps = subs.map(pct);
+    const summary = `${subs.length} submitted · Average ${Math.round(ps.reduce((x, y) => x + y, 0) / ps.length)}% · Highest ${Math.max(...ps)}% · Lowest ${Math.min(...ps)}%`;
+
+    const rows = subs.flatMap((s) => {
+      const detail = h('tr', { hidden: 'hidden' }, h('td', { colspan: 6 }, h('div', { class: 'scroll' }, h('table', { class: 'tbl' },
+        h('thead', {}, h('tr', {}, ['#', 'Question', 'Answered', 'Correct answer', 'Result'].map((t) => h('th', {}, t)))),
+        h('tbody', {}, s.answers.map((x) => {
+          const q = data.questions[x.number - 1] || { text: '', options: [] };
+          return h('tr', { class: 'row-' + x.result }, h('td', {}, x.number), h('td', {}, q.text),
+            h('td', {}, x.chosenIndex >= 0 ? `${letter(x.chosenIndex)}. ${q.options[x.chosenIndex]}` : 'No answer'),
+            h('td', {}, `${letter(x.correctIndex)}. ${q.options[x.correctIndex]}`),
+            h('td', {}, x.result === 'correct' ? 'Correct' : x.result === 'wrong' ? 'Wrong' : 'Not answered'));
+        }))))));
+      const toggle = h('button', { class: 'btn ghost small', onclick: () => {
+        detail.hidden = !detail.hidden; toggle.textContent = detail.hidden ? 'Show answers' : 'Hide answers';
+      } }, 'Show answers');
+      const retake = h('button', { class: 'btn danger small', onclick: async () => {
+        if (!confirm(`Remove ${s.studentName}'s result so they can take it again?`)) return;
+        await api('/api/classwork/submissions/' + s.id, { method: 'DELETE' }); toast('Result removed'); load();
+      } }, 'Allow retake');
+      return [h('tr', {}, h('td', {}, s.studentName), h('td', {}, `${s.score}/${s.total}`), h('td', {}, pct(s) + '%'),
+        h('td', {}, mmss(s.timeUsedSeconds)), h('td', {}, fmtDate(s.submittedAt)), h('td', {}, h('div', { class: 'row' }, toggle, retake))), detail];
+    });
+
+    return [h('div', { class: 'row sub' }, h('span', { class: 'meta', style: 'margin:0' }, summary), h('span', { class: 'spacer' }),
+      h('button', { class: 'btn ghost small', onclick: () => exportCsv(a, data) }, 'Export CSV')),
+      h('div', { class: 'scroll' }, h('table', { class: 'tbl' },
+        h('thead', {}, h('tr', {}, ['Student', 'Score', '%', 'Time', 'Submitted', ''].map((t) => h('th', {}, t)))), h('tbody', {}, rows)))];
+  }
+
+  function exportCsv(a, data) {
+    const cell = (v) => { let s = v == null ? '' : String(v); if (/^[=+\-@\t\r]/.test(s)) s = "'" + s; return '"' + s.replace(/"/g, '""') + '"'; };
+    const head = ['Student', 'Submitted', 'Score', 'Total', 'Percent', 'Time used', ...data.questions.map((_, i) => 'Q' + (i + 1))];
+    const lines = [head, ...data.submissions.map((s) => [s.studentName, s.submittedAt, s.score, s.total, pct(s), mmss(s.timeUsedSeconds),
+      ...s.answers.map((x) => (x.chosenIndex >= 0 ? letter(x.chosenIndex) : ''))])].map((r) => r.map(cell).join(','));
+    const link = h('a', { href: URL.createObjectURL(new Blob(['\ufeff' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' })),
+      download: (a.title.replace(/[^a-z0-9]+/gi, '_').toLowerCase() || 'results') + '_results.csv' });
+    document.body.append(link); link.click(); link.remove();
+  }
+
+  function subRow(a, s) {
+    const grade = h('input', { type: 'number', min: 0, max: a.points, value: s.grade ?? '', 'aria-label': 'Grade', style: 'width:6rem' });
+    const fb = h('input', { value: s.feedback || '', placeholder: 'Feedback (optional)', 'aria-label': 'Feedback' });
+    return h('div', { class: 'sub' },
+      h('div', { class: 'meta' }, s.studentName + ' · ' + fmtDate(s.submittedAt)),
+      h('div', { class: 'body' }, s.content),
+      h('div', { class: 'row', style: 'margin-top:.6rem' }, grade, h('span', {}, '/ ' + a.points), fb,
+        h('button', { class: 'btn small', onclick: async () => {
+          try { await api(`/api/classwork/submissions/${s.id}/grade`, { method: 'POST', body: { grade: grade.value, feedback: fb.value } }); toast('Grade saved'); }
+          catch (e) { toast(e.message, true); }
+        } }, 'Save grade')));
+  }
+
+  function teacherCard(a) {
+    const panel = h('div');
+    let open = false;
+    const toggle = h('button', { class: 'btn ghost small', onclick: async () => {
+      open = !open;
+      if (!open) return panel.replaceChildren();
+      const data = await api(`/api/classwork/${a.id}/submissions`);
+      panel.replaceChildren(...(a.isExam ? examPanel(a, data)
+        : data.submissions.length ? data.submissions.map((s) => subRow(a, s)) : [h('p', { class: 'meta sub' }, 'Nothing handed in yet.')]));
+    } }, (a.isExam ? 'Marks' : 'Submissions') + ' (' + a.submissionCount + ')');
+    return h('article', { class: 'card' },
+      h('div', { class: 'row' }, h('h3', { style: 'margin:0' }, a.title), a.isExam && h('span', { class: 'chip' }, 'Homework file')),
+      h('div', { class: 'meta' }, due(a)),
+      a.instructions && h('div', { class: 'body' }, a.instructions),
+      h('div', { class: 'row', style: 'margin-top:.8rem' }, toggle,
+        a.isExam && h('a', { class: 'btn ghost small', href: '/classwork/' + a.id }, 'Preview'),
+        h('span', { class: 'spacer' }),
+        h('button', { class: 'btn danger small', onclick: async () => {
+          if (!confirm('Delete this assignment and all its submissions?')) return;
+          await api('/api/classwork/' + a.id, { method: 'DELETE' }); toast('Deleted'); load();
+        } }, 'Delete')),
+      panel);
+  }
+
+  function studentCard(a) {
+    const s = a.submission;
+    if (a.isExam) {
+      return h('article', { class: 'card' },
+        h('div', { class: 'row' }, h('h3', { style: 'margin:0' }, a.title), h('span', { class: 'spacer' }),
+          s ? h('span', { class: 'chip ok' }, `Score ${s.score}/${s.total}`) : h('span', { class: 'chip' }, 'Not started')),
+        h('div', { class: 'meta' }, due(a)),
+        a.instructions && h('div', { class: 'body' }, a.instructions),
+        h('div', { class: 'row', style: 'margin-top:.8rem' },
+          s ? h('span', { class: 'meta', style: 'margin:0' }, `${s.correctCount} correct · ${s.wrongCount} wrong · ${s.unansweredCount} unanswered · ${mmss(s.timeUsedSeconds)}`)
+            : h('a', { class: 'btn', href: '/classwork/' + a.id }, 'Start homework')));
+    }
+    const graded = s && s.grade != null;
+    const box = h('textarea', { rows: 4, placeholder: 'Write your answer or paste a link', 'aria-label': 'Your answer', disabled: graded ? 'disabled' : null }, s ? s.content : '');
+    const status = graded ? h('span', { class: 'chip ok' }, `Graded ${s.grade}/${a.points}`)
+      : s ? h('span', { class: 'chip wait' }, 'Handed in') : h('span', { class: 'chip' }, 'Not handed in');
+    return h('article', { class: 'card' },
+      h('div', { class: 'row' }, h('h3', { style: 'margin:0' }, a.title), h('span', { class: 'spacer' }), status),
+      h('div', { class: 'meta' }, due(a)),
+      a.instructions && h('div', { class: 'body' }, a.instructions),
+      h('div', { style: 'margin-top:.8rem' }, box),
+      graded && s.feedback && h('div', { class: 'feedback' }, s.feedback),
+      !graded && h('div', { class: 'row end', style: 'margin-top:.6rem' }, h('button', { class: 'btn', onclick: async () => {
+        try { await api(`/api/classwork/${a.id}/submit`, { method: 'POST', body: { content: box.value } }); toast(s ? 'Updated' : 'Handed in'); load(); }
+        catch (e) { toast(e.message, true); }
+      } }, s ? 'Update work' : 'Hand in')));
+  }
+
+  async function load() {
+    const items = await api('/api/classwork');
+    list.replaceChildren(...(items.length ? items.map(isTeacher ? teacherCard : studentCard)
+      : [h('div', { class: 'empty' }, isTeacher ? 'No assignments yet. Create one above.' : 'No assignments yet. Your teacher will post them here.')]));
+  }
+  load();
+})();
+</script>
+</body></html>

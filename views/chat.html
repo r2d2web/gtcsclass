@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Chat · Classroom</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="/css/style.css"></head>
+<body>
+<div class="app"><nav class="side" id="nav" aria-label="Main"></nav><main id="main"></main></div>
+<script src="/js/app.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+(async () => {
+  const me = await shell('/chat');
+  const main = document.getElementById('main');
+  const log = h('div', { class: 'log', 'aria-live': 'polite' });
+  const input = h('input', { placeholder: 'Message the class', maxlength: 1000, 'aria-label': 'Message', autocomplete: 'off' });
+  const form = h('form', {}, input, h('button', { class: 'btn' }, 'Send'));
+  main.append(h('h1', {}, 'Chat'), h('p', { class: 'lede' }, 'Everyone in the class can see these messages.'),
+    h('div', { class: 'chat' }, log, form));
+
+  function add(m) {
+    const stick = log.scrollHeight - log.scrollTop - log.clientHeight < 80;
+    log.append(h('div', { class: 'msg' + (m.userId === me.id ? ' mine' : '') },
+      h('div', { class: 'who' }, m.name + (m.role === 'teacher' ? ' (teacher)' : '') + ' · ' + fmtDate(m.createdAt)),
+      h('div', { class: 'bubble' }, m.text)));
+    if (stick || m.userId === me.id) log.scrollTop = log.scrollHeight;
+  }
+
+  (await api('/api/chat')).forEach(add);
+  log.scrollTop = log.scrollHeight;
+  if (!log.children.length) log.append(h('div', { class: 'empty', id: 'none' }, 'No messages yet. Say hello.'));
+
+  const socket = io();
+  socket.on('message', (m) => { const n = document.getElementById('none'); if (n) n.remove(); add(m); });
+  socket.on('connect_error', () => toast('Chat connection lost. Refresh the page.', true));
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const text = input.value.trim();
+    if (!text) return;
+    socket.emit('message', text);
+    input.value = '';
+  });
+})();
+</script>
+</body></html>

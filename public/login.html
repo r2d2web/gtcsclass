@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sign in · Classroom</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="/css/style.css"></head>
+<body>
+<div class="login">
+  <section class="hero">
+    <div class="mark">Classroom</div>
+    <h1>Everything for class, in one place.</h1>
+    <p>Read announcements, hand in work, and talk with your class.</p>
+  </section>
+  <section class="panel">
+    <div class="tabs" role="tablist">
+      <button role="tab" id="t-in" aria-selected="true">Sign in</button>
+      <button role="tab" id="t-up" aria-selected="false">Create account</button>
+    </div>
+    <form id="form" novalidate>
+      <div id="nameWrap" hidden><label for="name">Full name</label><input id="name" autocomplete="name"></div>
+      <label for="email">Email</label><input id="email" type="email" autocomplete="email" required>
+      <label for="password">Password</label><input id="password" type="password" autocomplete="current-password" required>
+      <div id="codeWrap" hidden><label for="code">Teacher code <span style="font-weight:400;color:var(--muted)">(leave blank if you're a student)</span></label><input id="code" autocomplete="off"></div>
+      <p class="error" id="error" role="alert"></p>
+      <button class="btn" id="submit" style="margin-top:.5rem">Sign in</button>
+    </form>
+  </section>
+</div>
+<script src="/js/app.js"></script>
+<script>
+let mode = 'in';
+const $ = (id) => document.getElementById(id);
+function setMode(m) {
+  mode = m;
+  $('t-in').setAttribute('aria-selected', m === 'in');
+  $('t-up').setAttribute('aria-selected', m === 'up');
+  $('nameWrap').hidden = $('codeWrap').hidden = m === 'in';
+  $('submit').textContent = m === 'in' ? 'Sign in' : 'Create account';
+  $('password').autocomplete = m === 'in' ? 'current-password' : 'new-password';
+  $('error').textContent = '';
+}
+$('t-in').onclick = () => setMode('in');
+$('t-up').onclick = () => setMode('up');
+$('form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  $('error').textContent = '';
+  const body = { email: $('email').value, password: $('password').value };
+  if (mode === 'up') { body.name = $('name').value; body.teacherCode = $('code').value; }
+  try {
+    await api(mode === 'in' ? '/api/auth/login' : '/api/auth/register', { method: 'POST', body });
+    location.href = '/stream';
+  } catch (err) { $('error').textContent = err.message; }
+});
+</script>
+</body></html>

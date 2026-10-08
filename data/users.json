@@ -1,0 +1,18 @@
+[
+  {
+    "id": "7a685edb-f4e0-4866-a06e-83553737f8e3",
+    "createdAt": "2026-10-08T22:55:21.949Z",
+    "name": "Teacher",
+    "email": "kwakyedavid486@gmail.com",
+    "role": "teacher",
+    "passwordHash": "$2a$10$.rg/PSniAYmn/98tQDfnpO/QqdLgal/EIRgNNuftW/2yId4RVS3JG"
+  },
+  {
+    "id": "a18258b5-559b-4da9-b4f2-1b7d82463d91",
+    "createdAt": "2026-10-08T22:58:48.207Z",
+    "name": "dave",
+    "email": "dave@gmail.com",
+    "role": "student",
+    "passwordHash": "$2a$10$KBjzOws/MV5Jrh.m4uKjbOLuYVnzvZqlIWTm8eb/a6XKelFmpZvWm"
+  }
+]

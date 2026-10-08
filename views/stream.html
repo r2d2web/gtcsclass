@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Stream · Classroom</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="/css/style.css"></head>
+<body>
+<div class="app"><nav class="side" id="nav" aria-label="Main"></nav><main id="main"></main></div>
+<script src="/js/app.js"></script>
+
+<script>
+(async () => {
+  const me = await shell('/stream');
+  const main = document.getElementById('main');
+  const list = h('div');
+  main.append(h('h1', {}, 'Stream'), h('p', { class: 'lede' }, 'Announcements from your teacher.'));
+
+  if (me.role === 'teacher') {
+    const box = h('textarea', { rows: 3, placeholder: 'Share an update with the class', 'aria-label': 'New announcement' });
+    main.append(h('div', { class: 'card' }, box,
+      h('div', { class: 'row end', style: 'margin-top:.6rem' },
+        h('button', { class: 'btn', onclick: async () => {
+          try { await api('/api/stream', { method: 'POST', body: { text: box.value } }); box.value = ''; toast('Posted'); load(); }
+          catch (e) { toast(e.message, true); }
+        } }, 'Post announcement'))));
+  }
+  main.append(list);
+
+  async function load() {
+    const items = await api('/api/stream');
+    list.replaceChildren(...(items.length ? items.map((a) =>
+      h('article', { class: 'card' },
+        h('div', { class: 'meta row' }, h('span', {}, a.authorName + ' · ' + fmtDate(a.createdAt)), h('span', { class: 'spacer' }),
+          me.role === 'teacher' && h('button', { class: 'btn danger small', onclick: async () => {
+            if (!confirm('Delete this announcement?')) return;
+            await api('/api/stream/' + a.id, { method: 'DELETE' }); toast('Deleted'); load();
+          } }, 'Delete')),
+        h('div', { class: 'body' }, a.text))
+    ) : [h('div', { class: 'empty' }, me.role === 'teacher' ? 'No announcements yet. Post the first one above.' : 'No announcements yet. Check back soon.')]));
+  }
+  load();
+})();
+</script>
+</body></html>
