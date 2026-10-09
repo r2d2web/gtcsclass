@@ -6,5 +6,93 @@
     "username": "admin",
     "role": "teacher",
     "password": "02447930"
+  },
+  {
+    "id": "b4336100-4698-49b8-b03e-596246ff629f",
+    "createdAt": "2026-10-09T07:32:59.249Z",
+    "name": "Don Diego",
+    "username": "dave",
+    "role": "student",
+    "password": "02447930"
+  },
+  {
+    "id": "6072f3d7-5d6f-4246-ab05-798edb877470",
+    "createdAt": "2026-10-09T10:56:07.775Z",
+    "name": "Cadman Tandoh",
+    "username": "0603",
+    "role": "student",
+    "password": "0246406744"
+  },
+  {
+    "id": "7715bd01-d469-42aa-a075-5d21653b2737",
+    "createdAt": "2026-10-09T10:56:31.201Z",
+    "name": "Annette Appiah",
+    "username": "0605",
+    "role": "student",
+    "password": "0544762108"
+  },
+  {
+    "id": "f5317c62-aba6-4683-8cf9-62c3128eff50",
+    "createdAt": "2026-10-09T10:56:53.149Z",
+    "name": "Yvonne Frimpong",
+    "username": "0607",
+    "role": "student",
+    "password": "0240118767"
+  },
+  {
+    "id": "2ba2bde5-440f-4fdb-804f-f33d72302080",
+    "createdAt": "2026-10-09T10:57:17.082Z",
+    "name": "Emmanuella Ntiamoah",
+    "username": "0609",
+    "role": "student",
+    "password": "0244317568"
+  },
+  {
+    "id": "cd586e84-c36a-438b-942e-9c317b9dc57c",
+    "createdAt": "2026-10-09T10:58:01.018Z",
+    "name": "Emmanuel Afum",
+    "username": "0610",
+    "role": "student",
+    "password": "0591588271"
+  },
+  {
+    "id": "e0360fd9-1dfd-45e1-b1aa-198af5996a5a",
+    "createdAt": "2026-10-09T10:59:27.155Z",
+    "name": "Appau Martin",
+    "username": "0514",
+    "role": "student",
+    "password": "0241415750"
+  },
+  {
+    "id": "2d6c9a13-27ea-4615-9085-dd87278a7daa",
+    "createdAt": "2026-10-09T11:00:00.345Z",
+    "name": "Samuel Ansah",
+    "username": "0703",
+    "role": "student",
+    "password": "0277698080"
+  },
+  {
+    "id": "1458dfc9-b2cd-4529-94ec-6286f2f95593",
+    "createdAt": "2026-10-09T11:00:26.413Z",
+    "name": "Joseph Osei",
+    "username": "0706",
+    "role": "student",
+    "password": "0242580593"
+  },
+  {
+    "id": "7d4ae2da-acbe-4027-a6c5-491611070edf",
+    "createdAt": "2026-10-09T11:00:46.253Z",
+    "name": "Harriet Williamson",
+    "username": "0707",
+    "role": "student",
+    "password": "0244878582"
+  },
+  {
+    "id": "adeed76f-1dc7-4153-bb60-41a0ed5e011d",
+    "createdAt": "2026-10-09T11:01:06.763Z",
+    "name": "Jayden Adjetey Sowah",
+    "username": "0708",
+    "role": "student",
+    "password": "0556625613"
   }
 ]
