@@ -103,3 +103,10 @@ a.btn{text-decoration:none;display:inline-block}
 .logo-tile.sm{width:32px;height:32px;padding:3px;border-radius:8px}
 .login .hero .mark{display:flex;align-items:center;gap:.9rem}
 nav.side .brand .logo-tile{margin:0}
+
+/* stream attachments */
+.attach{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:.75rem}
+.attach img{max-width:100%;max-height:320px;border-radius:4px;border:1px solid var(--line);display:block}
+.attach a.file{display:inline-flex;gap:.5rem;align-items:baseline;padding:.45rem .8rem;border:1.5px solid var(--line);border-radius:6px;color:var(--ink);text-decoration:none;font-weight:600;background:#fff;overflow-wrap:anywhere}
+.attach a.file small{color:var(--muted);font-weight:400}
+.attach a.file:hover{background:var(--sun-soft)}

@@ -22,6 +22,7 @@ const sessionMiddleware = session({
 });
 
 app.post('/api/classwork', express.json({ limit: '3mb' })); // creating an assignment can include an exam file
+app.post('/api/stream', express.json({ limit: '35mb' })); // announcements can carry attached files
 app.use(express.json({ limit: '100kb' }));
 app.use(sessionMiddleware);
 app.use(attachUser);

@@ -10,18 +10,52 @@
   const me = await shell('/stream');
   const main = document.getElementById('main');
   const list = h('div');
+  const MAX_FILES = 5, MAX_BYTES = 5 * 1024 * 1024;
+  const size = (n) => (n < 1024 ? n + ' B' : n < 1048576 ? Math.round(n / 1024) + ' KB' : (n / 1048576).toFixed(1) + ' MB');
+  const toBase64 = (file) => new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(r.result.split(',')[1] || '');
+    r.onerror = () => reject(new Error('Could not read ' + file.name));
+    r.readAsDataURL(file);
+  });
   main.append(h('h1', {}, 'Stream'), h('p', { class: 'lede' }, 'Announcements from your teacher.'));
 
   if (me.role === 'teacher') {
     const box = h('textarea', { rows: 3, placeholder: 'Share an update with the class', 'aria-label': 'New announcement' });
+    const picker = h('input', { type: 'file', multiple: 'multiple', 'aria-label': 'Attach files',
+      accept: '.png,.jpg,.jpeg,.gif,.webp,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.zip' });
+    const chosen = h('div', { class: 'meta', style: 'margin:.4rem 0 0' }, `Optional: up to ${MAX_FILES} files, 5 MB each (images, PDF, Office files, text, zip).`);
+    picker.addEventListener('change', () => {
+      chosen.textContent = picker.files.length ? [...picker.files].map((f) => `${f.name} (${size(f.size)})`).join(', ') : '';
+    });
+    const post = h('button', { class: 'btn', onclick: async () => {
+      const picked = [...picker.files];
+      if (picked.length > MAX_FILES) return toast(`Choose at most ${MAX_FILES} files.`, true);
+      const big = picked.find((f) => f.size > MAX_BYTES);
+      if (big) return toast(`${big.name} is larger than 5 MB.`, true);
+      post.disabled = true; post.textContent = picked.length ? 'Uploading…' : 'Posting…';
+      try {
+        const attachments = await Promise.all(picked.map(async (f) => ({ name: f.name, data: await toBase64(f) })));
+        await api('/api/stream', { method: 'POST', body: { text: box.value, attachments } });
+        box.value = ''; picker.value = ''; chosen.textContent = ''; toast('Posted'); load();
+      } catch (e) { toast(e.message, true); }
+      post.disabled = false; post.textContent = 'Post announcement';
+    } }, 'Post announcement');
     main.append(h('div', { class: 'card' }, box,
-      h('div', { class: 'row end', style: 'margin-top:.6rem' },
-        h('button', { class: 'btn', onclick: async () => {
-          try { await api('/api/stream', { method: 'POST', body: { text: box.value } }); box.value = ''; toast('Posted'); load(); }
-          catch (e) { toast(e.message, true); }
-        } }, 'Post announcement'))));
+      h('div', { style: 'margin-top:.6rem' }, h('label', { style: 'margin:0 0 .25rem' }, 'Attach files'), picker, chosen),
+      h('div', { class: 'row end', style: 'margin-top:.6rem' }, post)));
   }
   main.append(list);
+
+  function attachments(a) {
+    if (!a.attachments || !a.attachments.length) return null;
+    return h('div', { class: 'attach' }, a.attachments.map((f) => {
+      const url = '/api/stream/files/' + f.id;
+      return f.isImage
+        ? h('a', { href: url, target: '_blank', rel: 'noopener' }, h('img', { src: url, alt: f.name, loading: 'lazy' }))
+        : h('a', { class: 'file', href: url, download: f.name }, f.name, h('small', {}, size(f.size)));
+    }));
+  }
 
   async function load() {
     const items = await api('/api/stream');
@@ -29,10 +63,11 @@
       h('article', { class: 'card' },
         h('div', { class: 'meta row' }, h('span', {}, a.authorName + ' · ' + fmtDate(a.createdAt)), h('span', { class: 'spacer' }),
           me.role === 'teacher' && h('button', { class: 'btn danger small', onclick: async () => {
-            if (!confirm('Delete this announcement?')) return;
+            if (!confirm('Delete this announcement' + (a.attachments && a.attachments.length ? ' and its files?' : '?'))) return;
             await api('/api/stream/' + a.id, { method: 'DELETE' }); toast('Deleted'); load();
           } }, 'Delete')),
-        h('div', { class: 'body' }, a.text))
+        a.text && h('div', { class: 'body' }, a.text),
+        attachments(a))
     ) : [h('div', { class: 'empty' }, me.role === 'teacher' ? 'No announcements yet. Post the first one above.' : 'No announcements yet. Check back soon.')]));
   }
   load();

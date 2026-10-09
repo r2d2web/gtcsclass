@@ -28,3 +28,8 @@ Teachers can upload a self-grading exam `.html` file (like `homework_4.html`) wh
 - Teachers see score, percentage, time used and per-question answers, can export a CSV, and can remove a
   result ("Allow retake").
 - Note: the file the student receives contains the answer key, so a determined student could read it in the page source.
+
+## Stream attachments
+Teachers can attach up to 5 files (5 MB each: images, PDF, Office files, txt, csv, zip) to an announcement.
+Files are saved in `data/uploads` (git-ignored) and, like all runtime data, are lost on Render's free tier when the service restarts.
+Only the allowed types are accepted, and files are served with headers that stop them running as pages.
