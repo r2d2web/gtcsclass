@@ -43,12 +43,18 @@ function toast(msg, bad) {
   t._timer = setTimeout(() => (t.className = ''), 2800);
 }
 
+// The school logo in a white tile (hidden automatically if /logo.png is missing).
+function logoTile(size) {
+  return h('span', { class: 'logo-tile ' + size },
+    h('img', { src: '/logo.png', alt: '', onerror: (e) => e.target.parentNode.remove() }));
+}
+
 // Renders the sidebar and returns the signed-in user.
 async function shell(active) {
   const { user } = await api('/api/auth/me');
   const link = (href, label) => h('a', { href, 'aria-current': active === href ? 'page' : null }, label);
   document.getElementById('nav').append(
-    h('div', { class: 'brand' }, 'Classroom'),
+    h('div', { class: 'brand' }, logoTile(''), 'Classroom'),
     link('/stream', 'Stream'),
     link('/classwork', 'Classwork'),
     link('/chat', 'Chat'),

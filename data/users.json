@@ -1,18 +1,18 @@
 [
   {
-    "id": "7a685edb-f4e0-4866-a06e-83553737f8e3",
-    "createdAt": "2026-10-08T22:55:21.949Z",
-    "name": "Teacher",
-    "email": "kwakyedavid486@gmail.com",
+    "id": "e6677da0-e21b-4dd7-a2c3-76a14938efc8",
+    "createdAt": "2026-10-09T07:13:28.329Z",
+    "name": "David Kwakye",
+    "username": "admin",
     "role": "teacher",
-    "passwordHash": "$2a$10$.rg/PSniAYmn/98tQDfnpO/QqdLgal/EIRgNNuftW/2yId4RVS3JG"
+    "password": "02447930"
   },
   {
-    "id": "a18258b5-559b-4da9-b4f2-1b7d82463d91",
-    "createdAt": "2026-10-08T22:58:48.207Z",
-    "name": "dave",
-    "email": "dave@gmail.com",
+    "id": "d7619c65-8002-4795-950e-90ae6014353d",
+    "createdAt": "2026-10-09T07:15:27.095Z",
+    "name": "Dan Diego",
+    "username": "dan",
     "role": "student",
-    "passwordHash": "$2a$10$KBjzOws/MV5Jrh.m4uKjbOLuYVnzvZqlIWTm8eb/a6XKelFmpZvWm"
+    "password": "12345678"
   }
 ]

@@ -7,12 +7,12 @@ Node.js + Express + Socket.IO, with JSON files as the database.
 2. Copy `.env.example` to `.env` and fill it in
 3. `npm run dev` then open http://localhost:3000
 
-The first start creates a teacher account from `TEACHER_EMAIL` / `TEACHER_PASSWORD`.
-Students sign up on the login page. A sign-up that includes `TEACHER_CODE` becomes a teacher.
+The teacher account lives in `data/users.json` (username `admin`). Everyone who signs up on the login page is a student.
+Passwords are stored as plain text.
 
 ## Deploy on Render
 - Build command: `npm install`  |  Start command: `node server.js`
-- Environment: `NODE_ENV=production`, `SESSION_SECRET`, `TEACHER_EMAIL`, `TEACHER_PASSWORD`, `TEACHER_CODE`
+- Environment: `NODE_ENV=production`, `SESSION_SECRET`
 
 ## Free-tier limits
 Render's free filesystem resets on every redeploy, restart and spin-down, so data written at runtime

@@ -1,11 +1,11 @@
-:root{--ink:#14213d;--ink2:#26375e;--paper:#eef1f5;--card:#fff;--line:#d5dbe4;--text:#1b2433;--muted:#5d6b82;--sun:#ffc93c;--sun-soft:#fff3cc;--ok:#1f7a52;--bad:#b83a31}
+:root{--ink:#c8102e;--ink2:#a30d25;--paper:#faf6f6;--card:#fff;--line:#e8dadc;--text:#2a1a1d;--muted:#7a5f64;--sun:#fff;--sun-soft:#fde8eb;--ok:#1f7a52;--bad:#a30d25}
 *{box-sizing:border-box}
 html{font-size:16px}
 body{margin:0;background:var(--paper);color:var(--text);font:1rem/1.55 'Instrument Sans',system-ui,sans-serif}
 h1,h2,h3{font-family:'Bricolage Grotesque','Instrument Sans',sans-serif;line-height:1.15;margin:0 0 .5rem;letter-spacing:-.01em}
 h1{font-size:2rem}h2{font-size:1.35rem}h3{font-size:1.1rem}
 button,input,textarea{font:inherit;color:inherit}
-:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+:focus-visible{outline:3px solid var(--ink);outline-offset:2px;box-shadow:0 0 0 6px #fff}
 
 .btn{border:0;background:var(--ink);color:#fff;padding:.55rem 1.1rem;border-radius:999px;cursor:pointer;font-weight:600}
 .btn:hover{background:var(--ink2)}
@@ -20,12 +20,12 @@ label{display:block;font-weight:600;font-size:.9rem;margin:.9rem 0 .25rem}
 /* app shell */
 .app{display:grid;grid-template-columns:230px 1fr;min-height:100vh}
 nav.side{background:var(--ink);color:#fff;padding:1.5rem 1rem;display:flex;flex-direction:column;gap:.25rem;position:sticky;top:0;height:100vh}
-nav.side .brand{font:700 1.4rem 'Bricolage Grotesque',sans-serif;margin:0 .5rem 1.5rem;color:var(--sun)}
-nav.side a{color:#cfd8ea;text-decoration:none;padding:.6rem .75rem;border-radius:6px;font-weight:500}
+nav.side .brand{display:flex;align-items:center;gap:.65rem;font:700 1.35rem 'Bricolage Grotesque',sans-serif;margin:0 .5rem 1.5rem;color:#fff}
+nav.side a{color:#ffd9de;text-decoration:none;padding:.6rem .75rem;border-radius:6px;font-weight:500}
 nav.side a:hover{background:var(--ink2);color:#fff}
 nav.side a[aria-current=page]{background:var(--sun);color:var(--ink);font-weight:700}
 nav.side .who{margin-top:auto;padding:.75rem;border-top:1px solid var(--ink2);font-size:.9rem}
-nav.side .who small{display:block;color:#9fb0cf}
+nav.side .who small{display:block;color:#ffc2cb}
 nav.side .who button{margin-top:.6rem;background:none;border:1.5px solid var(--ink2);color:#fff;border-radius:999px;padding:.3rem .8rem;cursor:pointer}
 main{padding:2rem clamp(1rem,4vw,3rem);max-width:820px;width:100%}
 .lede{color:var(--muted);margin:0 0 1.5rem}
@@ -39,8 +39,8 @@ main{padding:2rem clamp(1rem,4vw,3rem);max-width:820px;width:100%}
 .empty{color:var(--muted);border:1.5px dashed var(--line);border-radius:4px;padding:2rem;text-align:center}
 .chip{display:inline-block;font-size:.8rem;font-weight:600;padding:.1rem .6rem;border-radius:999px;background:var(--paper);color:var(--muted)}
 .chip.ok{background:#d9f1e5;color:var(--ok)}
-.chip.wait{background:var(--sun-soft);color:#7a5a00}
-.feedback{border-left:4px solid var(--sun);padding:.3rem .8rem;margin-top:.6rem;background:var(--sun-soft)}
+.chip.wait{background:var(--sun-soft);color:#8f0b20}
+.feedback{border-left:4px solid var(--ink);padding:.3rem .8rem;margin-top:.6rem;background:var(--sun-soft)}
 .sub{border-top:1px solid var(--line);padding-top:.8rem;margin-top:.8rem}
 details.card summary{cursor:pointer;font-weight:700}
 
@@ -58,16 +58,16 @@ details.card summary{cursor:pointer;font-weight:700}
 .login{display:grid;grid-template-columns:1.1fr 1fr;min-height:100vh}
 .login .hero{background:var(--ink);color:#fff;padding:clamp(2rem,6vw,5rem);display:flex;flex-direction:column;justify-content:flex-end}
 .login .hero h1{font-size:clamp(2.4rem,5vw,4rem);max-width:12ch}
-.login .hero p{color:#b9c6e0;max-width:36ch}
+.login .hero p{color:#ffd9de;max-width:36ch}
 .login .hero .mark{color:var(--sun);font:700 1.3rem 'Bricolage Grotesque',sans-serif;margin-bottom:auto}
 .login .panel{padding:clamp(1.5rem,5vw,4rem);display:flex;flex-direction:column;justify-content:center;max-width:460px;width:100%}
 .tabs{display:flex;gap:1.25rem;border-bottom:1.5px solid var(--line);margin-bottom:.5rem}
 .tabs button{background:none;border:0;padding:.5rem 0;cursor:pointer;color:var(--muted);font-weight:600;border-bottom:3px solid transparent;margin-bottom:-1.5px}
-.tabs button[aria-selected=true]{color:var(--ink);border-bottom-color:var(--sun)}
+.tabs button[aria-selected=true]{color:var(--ink);border-bottom-color:var(--ink)}
 .error{color:var(--bad);font-weight:600;min-height:1.5rem;margin:.75rem 0 0}
 
 #toast{position:fixed;bottom:1.25rem;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:.6rem 1.1rem;border-radius:999px;opacity:0;pointer-events:none;transition:opacity .2s}
-#toast.show{opacity:1}#toast.bad{background:var(--bad)}
+#toast.show{opacity:1}#toast.bad{background:#5a0612}
 
 @media(max-width:760px){
   .app{grid-template-columns:1fr}
@@ -95,3 +95,11 @@ a.btn{text-decoration:none;display:inline-block}
 .exambar .chip{background:var(--sun);color:var(--ink)}
 .examframe{display:block;width:100%;height:calc(100vh - 3.25rem);border:0;background:#fff}
 .done{max-width:520px;margin:3rem auto;padding:0 1rem}
+
+/* logo */
+.logo-tile{display:inline-flex;flex:none;width:42px;height:42px;padding:4px;background:#fff;border-radius:10px}
+.logo-tile img{width:100%;height:100%;object-fit:contain;display:block}
+.logo-tile.lg{width:72px;height:72px;padding:6px;border-radius:16px}
+.logo-tile.sm{width:32px;height:32px;padding:3px;border-radius:8px}
+.login .hero .mark{display:flex;align-items:center;gap:.9rem}
+nav.side .brand .logo-tile{margin:0}

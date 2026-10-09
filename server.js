@@ -2,7 +2,6 @@ const path = require('path');
 const http = require('http');
 const express = require('express');
 const session = require('express-session');
-const bcrypt = require('bcryptjs');
 const { Server } = require('socket.io');
 const db = require('./db');
 const { attachUser, requirePage } = require('./middleware/auth');
@@ -61,14 +60,5 @@ io.on('connection', (socket) => {
   });
 });
 
-// First run: create a teacher account so you can sign in.
-async function seed() {
-  if (db.all('users').length) return;
-  const email = (process.env.TEACHER_EMAIL || 'teacher@example.com').toLowerCase();
-  const password = process.env.TEACHER_PASSWORD || 'changeme123';
-  db.insert('users', { name: 'Teacher', email, role: 'teacher', passwordHash: await bcrypt.hash(password, 10) });
-  console.log(`Seeded teacher account: ${email}`);
-}
-
 const PORT = process.env.PORT || 3000;
-seed().then(() => server.listen(PORT, () => console.log(`Classroom running on port ${PORT}`)));
+server.listen(PORT, () => console.log(`Classroom running on port ${PORT}`));
