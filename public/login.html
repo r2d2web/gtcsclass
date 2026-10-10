@@ -9,14 +9,10 @@
     <p>Read announcements, hand in work, and talk with your class.</p>
   </section>
   <section class="panel">
-    <div class="tabs" role="tablist">
-      <button role="tab" id="t-in" aria-selected="true">Sign in</button>
-      <button role="tab" id="t-up" aria-selected="false">Create account</button>
-    </div>
+    <h2 style="font-size:1.6rem">Sign in</h2>
+    <p class="lede" style="margin-bottom:.5rem">Use the username and password your teacher gave you.</p>
     <form id="form" novalidate>
-      <div id="nameWrap" hidden><label for="name">Full name</label><input id="name" autocomplete="name"></div>
-      <label for="username">Username</label><input id="username" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="20" required>
-      <div id="userHint" hidden style="color:var(--muted);font-size:.85rem;margin-top:.25rem">3 to 20 characters: letters, numbers, dots, dashes, underscores.</div>
+      <label for="username">Username</label><input id="username" autocomplete="username" autocapitalize="none" spellcheck="false" required>
       <label for="password">Password</label><input id="password" type="password" autocomplete="current-password" required>
       <p class="error" id="error" role="alert"></p>
       <button class="btn" id="submit" style="margin-top:.5rem">Sign in</button>
@@ -25,28 +21,15 @@
 </div>
 <script src="/js/app.js"></script>
 <script>
-let mode = 'in';
 const $ = (id) => document.getElementById(id);
-function setMode(m) {
-  mode = m;
-  $('t-in').setAttribute('aria-selected', m === 'in');
-  $('t-up').setAttribute('aria-selected', m === 'up');
-  $('nameWrap').hidden = $('userHint').hidden = m === 'in';
-  $('submit').textContent = m === 'in' ? 'Sign in' : 'Create account';
-  $('password').autocomplete = m === 'in' ? 'current-password' : 'new-password';
-  $('error').textContent = '';
-}
-$('t-in').onclick = () => setMode('in');
-$('t-up').onclick = () => setMode('up');
 $('form').addEventListener('submit', async (e) => {
   e.preventDefault();
   $('error').textContent = '';
-  const body = { username: $('username').value, password: $('password').value };
-  if (mode === 'up') { body.name = $('name').value; }
+  $('submit').disabled = true;
   try {
-    await api(mode === 'in' ? '/api/auth/login' : '/api/auth/register', { method: 'POST', body });
+    await api('/api/auth/login', { method: 'POST', body: { username: $('username').value, password: $('password').value } });
     location.href = '/stream';
-  } catch (err) { $('error').textContent = err.message; }
+  } catch (err) { $('error').textContent = err.message; $('submit').disabled = false; }
 });
 </script>
 </body></html>
