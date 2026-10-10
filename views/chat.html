@@ -12,7 +12,7 @@
   const log = h('div', { class: 'log', 'aria-live': 'polite' });
   const input = h('input', { placeholder: 'Message the class', maxlength: 1000, 'aria-label': 'Message', autocomplete: 'off' });
   const form = h('form', {}, input, h('button', { class: 'btn' }, 'Send'));
-  main.append(h('h1', {}, 'Chat'), h('p', { class: 'lede' }, 'Everyone in the class can see these messages.'),
+  main.append(h('h1', {}, 'Chat'), h('p', { class: 'lede' }, ' '),
     h('div', { class: 'chat' }, log, form));
 
   function add(m) {
