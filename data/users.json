@@ -5,7 +5,8 @@
     "name": "David Kwakye",
     "username": "admin",
     "role": "teacher",
-    "password": "02447930"
+    "password": "02447930",
+    "avatarVersion": 1791610896941
   },
   {
     "id": "b4336100-4698-49b8-b03e-596246ff629f",
@@ -21,7 +22,7 @@
     "name": "Cadman Tandoh",
     "username": "0603",
     "role": "student",
-    "password": "0246406744"
+    "password": "0244688449"
   },
   {
     "id": "7715bd01-d469-42aa-a075-5d21653b2737",

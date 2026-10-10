@@ -33,3 +33,11 @@ Teachers can upload a self-grading exam `.html` file (like `homework_4.html`) wh
 Teachers can attach up to 5 files (5 MB each: images, PDF, Office files, txt, csv, zip) to an announcement.
 Files are saved in `data/uploads` (git-ignored) and, like all runtime data, are lost on Render's free tier when the service restarts.
 Only the allowed types are accepted, and files are served with headers that stop them running as pages.
+
+## Stream likes and comments
+Everyone can like announcements and comment on them. Authors can delete their own comments and teachers can delete any.
+Comments are stored in `data/comments.json`.
+
+## Profile photos
+Click your avatar in the header to add, change or remove your photo. It is cropped square and shrunk to 256x256 in the browser,
+saved in `data/uploads/avatars` (git-ignored, lost on Render's free-tier restarts), and shown beside your chat messages, posts and comments. Without a photo, your initials are shown.

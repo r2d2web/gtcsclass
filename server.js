@@ -4,6 +4,7 @@ const express = require('express');
 const session = require('express-session');
 const { Server } = require('socket.io');
 const db = require('./db');
+const { avatarUrl } = require('./lib/avatar');
 const { attachUser, requirePage } = require('./middleware/auth');
 
 const app = express();
@@ -23,6 +24,7 @@ const sessionMiddleware = session({
 
 app.post('/api/classwork', express.json({ limit: '3mb' })); // creating an assignment can include an exam file
 app.post('/api/stream', express.json({ limit: '35mb' })); // announcements can carry attached files
+app.post('/api/profile/avatar', express.json({ limit: '1mb' })); // profile photo upload
 app.use(express.json({ limit: '100kb' }));
 app.use(sessionMiddleware);
 app.use(attachUser);
@@ -32,6 +34,7 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/stream', require('./routes/stream'));
 app.use('/api/classwork', require('./routes/classwork'));
 app.use('/api/chat', require('./routes/chat'));
+app.use('/api/profile', require('./routes/profile'));
 
 // Pages. The three app pages live in /views so they can't be fetched while signed out.
 app.use(express.static(path.join(__dirname, 'public')));
@@ -57,7 +60,7 @@ io.on('connection', (socket) => {
     const text = String(raw || '').trim().slice(0, 1000);
     if (!text) return;
     const msg = db.insert('messages', { userId: socket.user.id, text }, { max: 500 });
-    io.emit('message', { ...msg, name: socket.user.name, role: socket.user.role });
+    io.emit('message', { ...msg, name: socket.user.name, role: socket.user.role, avatarUrl: avatarUrl(socket.user) });
   });
 });
 

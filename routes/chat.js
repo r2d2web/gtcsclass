@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const db = require('../db');
+const { avatarUrl } = require('../lib/avatar');
 const { requireLogin } = require('../middleware/auth');
 
 router.use(requireLogin);
@@ -10,7 +11,7 @@ router.get('/', (req, res) => {
   res.json(
     db.all('messages').slice(-100).map((m) => {
       const u = users.find((x) => x.id === m.userId) || {};
-      return { ...m, name: u.name || 'Former member', role: u.role || 'student' };
+      return { ...m, name: u.name || 'Former member', role: u.role || 'student', avatarUrl: avatarUrl(u) };
     })
   );
 });
