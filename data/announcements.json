@@ -1,1 +1,18 @@
-[]
+[
+  {
+    "id": "be6760a5-1dc7-4011-8ad9-4b5359b98b0e",
+    "createdAt": "2026-10-10T11:04:58.635Z",
+    "authorId": "e6677da0-e21b-4dd7-a2c3-76a14938efc8",
+    "text": "Computer Networks notes!\n\nCopy or print before 19th October.",
+    "attachments": [
+      {
+        "id": "a065ebad-4047-41fb-9ac5-6f24f195148c",
+        "name": "5. Computer Networks.pdf",
+        "ext": "pdf",
+        "size": 505640,
+        "isImage": false
+      }
+    ],
+    "likes": []
+  }
+]
